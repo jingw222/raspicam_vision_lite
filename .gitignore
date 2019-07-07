@@ -1,0 +1,9 @@
+mobilenet_v1_1.0_224_quant
+mobilenet_v2_1.0_224_quant
+*.whl
+.DS_Store
+.ipynb_checkpoints/
+__pycache__/
+ostrich.jpg
+tf1-py35
+*.ipynb
