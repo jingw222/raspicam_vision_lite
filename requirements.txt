@@ -1,0 +1,4 @@
+Flask==1.1.0 
+numpy==.16.4 
+picamera==1.13 
+tensorflow==2.0.0b1  

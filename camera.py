@@ -7,7 +7,7 @@ import picamera.array
 
 
 WIDTH, HEIGHT = 1024, 768
-FRAMERATE = 30
+FRAMERATE = 40
 
 class VideoStreamCV2(object):
     def __init__(self):
@@ -50,8 +50,7 @@ class VideoStreamPiCam(object):
         
         
     def get_frame(self):
-        self.stream.truncate()
-        self.stream.seek(0)
+        self.stream.truncate(0)
         
         frame = next(self.cap)        
         # Reads image from frame.array

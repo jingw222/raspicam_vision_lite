@@ -1,5 +1,4 @@
-mobilenet_v1_1.0_224_quant
-mobilenet_v2_1.0_224_quant
+mobilenet_*
 *.whl
 .DS_Store
 .ipynb_checkpoints/

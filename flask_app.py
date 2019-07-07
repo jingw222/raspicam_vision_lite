@@ -16,8 +16,7 @@ MODEL_PATH = os.path.join(MODEL_DIR, 'mobilenet_v2_1.0_224_quant.tflite')
 LABELS_PATH = os.path.join(MODEL_DIR, 'labels_mobilenet_quant_v2_224.txt')
 tflitemodel = TFLiteInterpreter(MODEL_PATH, LABELS_PATH)
 
-frame_in_queue = mp.Queue(maxsize=1)
-label_out_queue = mp.Queue(maxsize=1)
+
 
 @app.route('/')
 def index():
@@ -25,23 +24,23 @@ def index():
 
 
 def gen(camera):
-    
-    frame = None
-    out = None
-    
-    def inference(frame, frame_in_queue, label_out_queue):
+
+    def inference(frame_in_queue, label_out_queue):
         while True:
             if not frame_in_queue.empty():
                 frame = frame_in_queue.get()
-                label_index, label = tflitemodel.inference(frame)
-                print('Label index: {0}\nLabel name: {1}'.format(label_index, label))
-                print('-'*20)
+                result = tflitemodel.inference(frame)
+                for item in result:
+                    print('Index: {}, Label: {}, Score: {}'.format(*item))
+                print('-'*30)
 
-                label_out_queue.put((label_index, label))
+                label_out_queue.put(result)
 
     
-    print("[INFO] starting process...")
-    p = mp.Process(target=inference, args=(frame, frame_in_queue, label_out_queue,), daemon=True)
+    frame_in_queue = mp.Queue(maxsize=1)
+    label_out_queue = mp.Queue(maxsize=1)
+    
+    p = mp.Process(target=inference, args=(frame_in_queue, label_out_queue,), daemon=True)
     p.start()
         
     while True:
@@ -53,7 +52,7 @@ def gen(camera):
             
         # Fetch the results from label_out_queue, if the output queue is not empty
         if not label_out_queue.empty():
-            label_index, label = label_out_queue.get()
+            result = label_out_queue.get()
             
         yield (b'--buf\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + buffer + b'\r\n\r\n')
