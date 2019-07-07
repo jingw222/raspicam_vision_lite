@@ -6,9 +6,15 @@ import picamera
 import picamera.array
 
 
+WIDTH, HEIGHT = 1024, 768
+FRAMERATE = 30
+
 class VideoStreamCV2(object):
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+        self.cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
 
 
     def __del__(self):
@@ -26,8 +32,8 @@ class VideoStreamCV2(object):
         
 class VideoStreamPiCam(object):
     def __init__(self):
-        self.resolution = (1024, 768)
-        self.framerate = 30
+        self.resolution = (WIDTH, HEIGHT)
+        self.framerate = FRAMERATE
         self.camera = picamera.PiCamera(resolution=self.resolution, framerate=self.framerate)
         self.stream = picamera.array.PiRGBArray(self.camera)
         
@@ -44,13 +50,12 @@ class VideoStreamPiCam(object):
         
         
     def get_frame(self):
-        next(self.cap)
-
         self.stream.truncate()
         self.stream.seek(0)
         
-        # Reads image from stream.array
-        frame = self.stream.array
+        frame = next(self.cap)        
+        # Reads image from frame.array
+        frame = frame.array
         ret, buf = cv2.imencode('.jpg', frame)
         return frame, buf.tobytes()
         
