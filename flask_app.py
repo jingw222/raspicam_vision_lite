@@ -53,15 +53,14 @@ def gen(camera):
         # Fetch the results from label_out_queue, if the output queue is not empty
         if not label_out_queue.empty():
             result = label_out_queue.get()
-            
-        yield (b'--buf\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + buffer + b'\r\n\r\n')
+        
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + buffer + b'\r\n\r\n' + )
 
         
 @app.route('/videostream')
 def videostream():
     return Response(gen(VideoStreamPiCam()),
-                    mimetype='multipart/x-mixed-replace; boundary=buf')
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 if __name__ == '__main__':
