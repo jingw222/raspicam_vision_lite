@@ -9,42 +9,23 @@ from camera import VideoStreamCV2, VideoStreamPiCam
 from tflite_model import TFLiteInterpreter
 
 
-app = Flask(__name__)
-
-MODEL_DIR = 'mobilenet_v2_1.0_224_quant'
-MODEL_PATH = os.path.join(MODEL_DIR, 'mobilenet_v2_1.0_224_quant.tflite')
-LABELS_PATH = os.path.join(MODEL_DIR, 'labels_mobilenet_quant_v2_224.txt')
-TOP_K = 5
-
-tflitemodel = TFLiteInterpreter(MODEL_PATH, LABELS_PATH)
-
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
-def gen(camera):
-
+def gen(camera, model):
+    
     def inference(frame_in_queue, label_out_queue):
         while True:
             if not frame_in_queue.empty():
                 frame = frame_in_queue.get()
-                label = tflitemodel.inference(frame, TOP_K)
+                label = model.inference(frame, TOP_K)
                 
                 text = ''
                 for item in label:
                     s = '{}: {}\t'.format(*item)
-                    print(s)
                     text += s
-                print('-'*30)
-
                 label_out_queue.put(text)
 
     
     frame_in_queue = mp.Queue(maxsize=1)
     label_out_queue = mp.Queue(maxsize=1)
-    
     p = mp.Process(target=inference, args=(frame_in_queue, label_out_queue,), daemon=True)
     p.start()
     
@@ -59,23 +40,23 @@ def gen(camera):
     (_, text_height), _ = cv2.getTextSize('test text', FONT_FACE, FONT_SCALE, THICKNESS)
     rectangle_shape = (250, text_height*(2*TOP_K+3))
     
-    list_text_last = ''
+    label_text_last = ''
     while True:
         frame = camera.get_frame()
         overlay = frame.copy()
         
-        # Set the current frame onto frame_in_queue, if the input queue is empty
+        # Sets the current frame onto frame_in_queue, if the input queue is empty
         if frame_in_queue.empty():
             frame_in_queue.put(frame)
             
-        # Fetch the results from label_out_queue, if the output queue is not empty
+        # Fetches the results from label_out_queue, if the output queue is not empty
         if not label_out_queue.empty():
-            list_text = label_out_queue.get().split('\t')
-            list_text_last = list_text
+            label_text = label_out_queue.get().split('\t')
+            label_text_last = label_text
         
-        if list_text_last:
+        if label_text_last:
             overlay = cv2.rectangle(overlay, ANCHOR, rectangle_shape, REC_COLOR, -1)
-            for i, text in enumerate(list_text_last):
+            for i, text in enumerate(label_text_last):
                 text_pos = (ANCHOR[0]+text_height, ANCHOR[1]+2*(i+1)*text_height)
                 overlay = cv2.putText(overlay, text, text_pos, FONT_FACE, FONT_SCALE, FONT_COLOR, THICKNESS, LINE_TYPE)
             overlay = cv2.addWeighted(frame, ALPHA, overlay, 1 - ALPHA, 0)
@@ -84,10 +65,24 @@ def gen(camera):
         ret, overlay = cv2.imencode('.jpg', overlay) 
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + overlay.tobytes() + b'\r\n\r\n')
 
-        
-@app.route('/videostream')
+
+TOP_K = 5
+
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+    
+    
+@app.route('/videostream', methods=['GET'])
 def videostream():
-    return Response(gen(VideoStreamPiCam()),
+    MODEL_NAME = 'mobilenet_v2_1.0_224_quant'
+    MODEL_PATH = os.path.join(MODEL_NAME, '{}.tflite'.format(MODEL_NAME))
+    LABELS_PATH = os.path.join(MODEL_NAME, 'labels.txt')
+    model = TFLiteInterpreter(MODEL_PATH, LABELS_PATH)
+    return Response(gen(VideoStreamPiCam(), model),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
