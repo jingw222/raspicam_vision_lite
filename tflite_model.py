@@ -35,6 +35,6 @@ class TFLiteInterpreter(object):
         preds = self.interpreter.get_tensor(self.output_details[0]['index'])[0]
 
         top_indices = preds.argsort()[-top:][::-1]
-        result = [(i, self.labels[i], preds[i]) for i in top_indices] # (indices, labels, scores)
-        result.sort(key=lambda x: x[2], reverse=True)
+        result = [(self.labels[i], preds[i]) for i in top_indices] # (labels, scores)
+        result.sort(key=lambda x: x[1], reverse=True)
         return result

@@ -24,10 +24,7 @@ class VideoStreamCV2(object):
     def get_frame(self):
         while self.cap.isOpened():
             ret, frame = self.cap.read()
-            
-            # Encodes image into JPEG in order to correctly display the video stream.
-            ret, buf = cv2.imencode('.jpg', frame)
-            return frame, buf.tobytes()
+            return frame
 
         
 class VideoStreamPiCam(object):
@@ -51,11 +48,7 @@ class VideoStreamPiCam(object):
         
     def get_frame(self):
         self.stream.truncate(0)
-        
-        frame = next(self.cap)        
-        # Reads image from frame.array
-        frame = frame.array
-        ret, buf = cv2.imencode('.jpg', frame)
-        return frame, buf.tobytes()
+        frame = next(self.cap)
+        return frame.array
         
 
