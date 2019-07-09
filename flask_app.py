@@ -50,12 +50,16 @@ def gen(camera):
     
     FONT_FACE = cv2.FONT_HERSHEY_PLAIN
     FONT_SCALE = 1
-    COLOR = (255, 255, 255)
+    FONT_COLOR = (255, 255, 255)
     THICKNESS = 1
     LINE_TYPE = cv2.LINE_AA
-    ALPHA = 0.5
-    list_text_last = ''
+    REC_COLOR = (0, 0, 0)
+    ALPHA = 0.6
+    ANCHOR = (20, 20)
+    (_, text_height), _ = cv2.getTextSize('test text', FONT_FACE, FONT_SCALE, THICKNESS)
+    rectangle_shape = (250, text_height*(2*TOP_K+3))
     
+    list_text_last = ''
     while True:
         frame = camera.get_frame()
         overlay = frame.copy()
@@ -69,14 +73,11 @@ def gen(camera):
             list_text = label_out_queue.get().split('\t')
             list_text_last = list_text
         
-        (_, text_height), baseline = cv2.getTextSize('test text', FONT_FACE, FONT_SCALE, THICKNESS)
-        anchor = (20, 20)
-        rectangle_shape = (250, text_height*(2*TOP_K+3))
-        
         if list_text_last:
-            overlay = cv2.rectangle(overlay, anchor, rectangle_shape, (0, 0, 0), -1)
+            overlay = cv2.rectangle(overlay, ANCHOR, rectangle_shape, REC_COLOR, -1)
             for i, text in enumerate(list_text_last):
-                overlay = cv2.putText(overlay, text, (anchor[0]+text_height, anchor[1]+2*(i+1)*text_height), FONT_FACE, FONT_SCALE, COLOR, THICKNESS, LINE_TYPE)
+                text_pos = (ANCHOR[0]+text_height, ANCHOR[1]+2*(i+1)*text_height)
+                overlay = cv2.putText(overlay, text, text_pos, FONT_FACE, FONT_SCALE, FONT_COLOR, THICKNESS, LINE_TYPE)
             overlay = cv2.addWeighted(frame, ALPHA, overlay, 1 - ALPHA, 0)
             
         # Encodes image into JPEG in order to correctly display the video stream.
