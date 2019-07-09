@@ -9,6 +9,9 @@ from camera import VideoStreamCV2, VideoStreamPiCam
 from tflite_model import TFLiteInterpreter
 
 
+TOP_K = 5
+
+
 def gen(camera, model):
     
     def inference(frame_in_queue, label_out_queue):
@@ -34,7 +37,7 @@ def gen(camera, model):
     FONT_COLOR = (255, 255, 255)
     THICKNESS = 1
     LINE_TYPE = cv2.LINE_AA
-    REC_COLOR = (0, 0, 0)
+    REC_COLOR = (64, 64, 64)
     ALPHA = 0.6
     ANCHOR = (20, 20)
     (_, text_height), _ = cv2.getTextSize('test text', FONT_FACE, FONT_SCALE, THICKNESS)
@@ -66,9 +69,6 @@ def gen(camera, model):
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + overlay.tobytes() + b'\r\n\r\n')
 
 
-TOP_K = 5
-
-
 app = Flask(__name__)
 
 @app.route('/')
@@ -76,12 +76,11 @@ def index():
     return render_template('index.html')
     
     
-@app.route('/videostream', methods=['GET'])
-def videostream():
-    MODEL_NAME = 'mobilenet_v2_1.0_224_quant'
-    MODEL_PATH = os.path.join(MODEL_NAME, '{}.tflite'.format(MODEL_NAME))
-    LABELS_PATH = os.path.join(MODEL_NAME, 'labels.txt')
-    model = TFLiteInterpreter(MODEL_PATH, LABELS_PATH)
+@app.route('/videostream/<model_version>', methods=['GET'])
+def videostream(model_version):
+    model_path = os.path.join(model_version, '{}.tflite'.format(model_version))
+    label_path = os.path.join(model_version, 'labels.txt')
+    model = TFLiteInterpreter(model_path, label_path)
     return Response(gen(VideoStreamPiCam(), model),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
