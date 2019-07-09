@@ -1,16 +1,8 @@
-import os
-import time
 import cv2
-import numpy as np
 import multiprocessing as mp
-import tensorflow as tf
-from flask import Flask, render_template, Response
-from camera import VideoStreamCV2, VideoStreamPiCam
-from tflite_model import TFLiteInterpreter
 
 
 TOP_K = 5
-
 
 def gen(camera, model):
     
@@ -69,22 +61,4 @@ def gen(camera, model):
         yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + overlay.tobytes() + b'\r\n\r\n')
 
 
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-    
-    
-@app.route('/videostream/<model_version>', methods=['GET'])
-def videostream(model_version):
-    model_path = os.path.join(model_version, '{}.tflite'.format(model_version))
-    label_path = os.path.join(model_version, 'labels.txt')
-    model = TFLiteInterpreter(model_path, label_path)
-    return Response(gen(VideoStreamPiCam(), model),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
 
