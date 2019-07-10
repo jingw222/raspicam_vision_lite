@@ -14,7 +14,7 @@ def create_app():
 
     @app.route('/', methods=['GET', 'POST'])
     def index():
-        candidates = [d for d in os.listdir(os.path.join(basepath, 'models')) if not d.startswith('.')]
+        candidates = [d for d in next(os.walk(os.path.join(basepath, 'models')))[1] if not d.startswith('.')]
         target = request.form.get("candidates")
         print('selected target: {}'.format(target))
         return render_template('index.html', candidates=candidates, target=target)

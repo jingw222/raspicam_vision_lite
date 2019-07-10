@@ -19,11 +19,13 @@ def gen(camera, model):
                 label_out_queue.put(text)
 
     
+    # Creates a child process dedicated for model inferencing
     frame_in_queue = mp.Queue(maxsize=1)
     label_out_queue = mp.Queue(maxsize=1)
     p = mp.Process(target=inference, args=(frame_in_queue, label_out_queue,), daemon=True)
     p.start()
     
+    # Sets properties for label overlays on frames
     FONT_FACE = cv2.FONT_HERSHEY_PLAIN
     FONT_SCALE = 1
     FONT_COLOR = (255, 255, 255)
@@ -35,9 +37,10 @@ def gen(camera, model):
     (_, text_height), _ = cv2.getTextSize('test text', FONT_FACE, FONT_SCALE, THICKNESS)
     rectangle_shape = (260, text_height*(2*TOP_K+3))
     
+    # Starts generating video frames indefinitely
     label_text_last = ''
     while True:
-        frame = camera.get_frame()
+        frame = next(camera)
         overlay = frame.copy()
         
         # Sets the current frame onto frame_in_queue, if the input queue is empty
@@ -49,6 +52,7 @@ def gen(camera, model):
             label_text = label_out_queue.get().split('\t')
             label_text_last = label_text
         
+        # Draws label overlays
         if label_text_last:
             overlay = cv2.rectangle(overlay, ANCHOR, rectangle_shape, REC_COLOR, -1)
             for i, text in enumerate(label_text_last):

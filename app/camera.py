@@ -2,6 +2,7 @@ import os
 import cv2
 import time
 import numpy as np
+import threading
 import picamera
 import picamera.array
 
@@ -12,25 +13,39 @@ FRAMERATE = 40
 class VideoStreamCV2(object):
     def __init__(self, **kwargs):
         self.cap = cv2.VideoCapture(0, **kwargs)
+        
+        # Sets camera properties
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
         self.cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
-
-
-    def __del__(self):
-        self.cap.release()
+        
+        # Makes sure video streaming is thread-safe
+        self.lock = threading.Lock()
 
         
-    def get_frame(self):
-        while self.cap.isOpened():
-            ret, frame = self.cap.read()
-            return frame
+    def __del__(self):
+        self.cap.release()
+        
+        
+    def __iter__(self):
+        return self
+        
+        
+    def __next__(self):
+        with self.lock:        
+            while self.cap.isOpened():
+                # Gets frames from camera
+                ret, frame = self.cap.read()
+                return frame
 
         
 class VideoStreamPiCam(object):
     def __init__(self, **kwargs):
+        # Sets camera properties
         self.resolution = (WIDTH, HEIGHT)
         self.framerate = FRAMERATE
+        
+        # Initiates a picamera object
         self.camera = picamera.PiCamera(resolution=self.resolution, framerate=self.framerate, **kwargs)
         self.stream = picamera.array.PiRGBArray(self.camera)
         
@@ -38,6 +53,9 @@ class VideoStreamPiCam(object):
         self.camera.start_preview()
 
         self.cap = self.camera.capture_continuous(self.stream, format='bgr', use_video_port=True)
+        
+        # Makes sure video streaming is thread-safe
+        self.lock = threading.Lock()
 
         
     def __del__(self):
@@ -46,11 +64,16 @@ class VideoStreamPiCam(object):
         self.camera.close()
         
         
-    def get_frame(self):
-        while not self.camera.closed:
-            self.stream.truncate()
-            self.stream.seek(0)
-            frame = next(self.cap)
-            return frame.array
-        
-
+    def __iter__(self):
+        return self
+    
+    
+    def __next__(self):
+        with self.lock:
+            while not self.camera.closed:
+                self.stream.truncate()
+                self.stream.seek(0)
+                # Gets frames from camera
+                frame = next(self.cap)
+                return frame.array
+    
