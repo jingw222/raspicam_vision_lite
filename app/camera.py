@@ -47,7 +47,8 @@ class VideoStreamPiCam(object):
         
         
     def get_frame(self):
-        self.stream.truncate(0)
+        self.stream.truncate()
+        self.stream.seek(0)
         frame = next(self.cap)
         return frame.array
         

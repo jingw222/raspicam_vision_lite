@@ -9,6 +9,8 @@ basepath = os.path.dirname(__file__)
 
 def create_app():
     app = Flask(__name__)
+    
+    camera = VideoStreamPiCam()
 
     @app.route('/')
     def index():
@@ -20,7 +22,7 @@ def create_app():
         model_path = os.path.join(basepath, 'models', model_version, '{}.tflite'.format(model_version))
         label_path = os.path.join(basepath, 'models', model_version, 'labels.txt')
         model = TFLiteInterpreter(model_path, label_path)
-        return Response(gen(VideoStreamPiCam(), model),
+        return Response(gen(camera, model),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
     
     return app
