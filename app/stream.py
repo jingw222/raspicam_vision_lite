@@ -33,7 +33,7 @@ def gen(camera, model):
     ALPHA = 0.6
     ANCHOR = (20, 20)
     (_, text_height), _ = cv2.getTextSize('test text', FONT_FACE, FONT_SCALE, THICKNESS)
-    rectangle_shape = (250, text_height*(2*TOP_K+3))
+    rectangle_shape = (260, text_height*(2*TOP_K+3))
     
     label_text_last = ''
     while True:

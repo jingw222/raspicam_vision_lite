@@ -1,8 +1,9 @@
-mobilenet_*
-*.whl
 .DS_Store
 .ipynb_checkpoints/
 __pycache__/
-ostrich.jpg
 tf1-py35
 *.ipynb
+*.py[cod]
+*.log
+instance/
+models/

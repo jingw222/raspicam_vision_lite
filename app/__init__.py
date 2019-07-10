@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, Response
+from flask import Flask, Response, render_template, request, session, redirect, url_for
 from .camera import VideoStreamCV2, VideoStreamPiCam
 from .interpreter import TFLiteInterpreter
 from .stream import gen
@@ -12,15 +12,18 @@ def create_app():
     
     camera = VideoStreamPiCam()
 
-    @app.route('/')
+    @app.route('/', methods=['GET', 'POST'])
     def index():
-        return render_template('index.html')
+        candidates = [d for d in os.listdir(os.path.join(basepath, 'models')) if not d.startswith('.')]
+        target = request.form.get("candidates")
+        print('selected target: {}'.format(target))
+        return render_template('index.html', candidates=candidates, target=target)
 
 
-    @app.route('/videostream/<model_version>', methods=['GET'])
-    def videostream(model_version):
-        model_path = os.path.join(basepath, 'models', model_version, '{}.tflite'.format(model_version))
-        label_path = os.path.join(basepath, 'models', model_version, 'labels.txt')
+    @app.route('/videostream/<target>', methods=['GET', 'POST'])
+    def videostream(target):
+        model_path = os.path.join(basepath, 'models', target, '{}.tflite'.format(target))
+        label_path = os.path.join(basepath, 'models', target, 'labels.txt')
         model = TFLiteInterpreter(model_path, label_path)
         return Response(gen(camera, model),
                         mimetype='multipart/x-mixed-replace; boundary=frame')

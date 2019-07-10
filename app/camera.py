@@ -10,8 +10,8 @@ WIDTH, HEIGHT = 1024, 768
 FRAMERATE = 40
 
 class VideoStreamCV2(object):
-    def __init__(self):
-        self.cap = cv2.VideoCapture(0)
+    def __init__(self, **kwargs):
+        self.cap = cv2.VideoCapture(0, **kwargs)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
         self.cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
@@ -28,10 +28,10 @@ class VideoStreamCV2(object):
 
         
 class VideoStreamPiCam(object):
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.resolution = (WIDTH, HEIGHT)
         self.framerate = FRAMERATE
-        self.camera = picamera.PiCamera(resolution=self.resolution, framerate=self.framerate)
+        self.camera = picamera.PiCamera(resolution=self.resolution, framerate=self.framerate, **kwargs)
         self.stream = picamera.array.PiRGBArray(self.camera)
         
         # Starts preview and prepares to capture images continuously to stream
@@ -47,9 +47,10 @@ class VideoStreamPiCam(object):
         
         
     def get_frame(self):
-        self.stream.truncate()
-        self.stream.seek(0)
-        frame = next(self.cap)
-        return frame.array
+        while not self.camera.closed:
+            self.stream.truncate()
+            self.stream.seek(0)
+            frame = next(self.cap)
+            return frame.array
         
 

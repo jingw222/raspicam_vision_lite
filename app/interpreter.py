@@ -9,8 +9,9 @@ class TFLiteInterpreter(object):
         self.interpreter.allocate_tensors()
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
-        self.IMG_WIDTH, self.IMG_HEIGHT = self.input_details[0]['shape'][1:3]
-        self.DTYPE = self.input_details[0]['dtype']
+        self.IMG_WIDTH, self.IMG_HEIGHT = self.input_details[0].get('shape')[1:3]
+        self.DTYPE = self.input_details[0].get('dtype')
+        self.QUANT = self.input_details[0].get('quantization')
         
         def load_labels(path):
             with open(path, 'r', newline='\n') as f:
