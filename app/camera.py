@@ -1,14 +1,24 @@
 import os
+import sys
 import cv2
 import time
 import numpy as np
 import threading
+import logging
 import picamera
 import picamera.array
 
 
 WIDTH, HEIGHT = 1024, 768
 FRAMERATE = 40
+
+logging.basicConfig(
+    stream=sys.stdout,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt=' %I:%M:%S ',
+    level="INFO"
+)
+logger = logging.getLogger(__name__)
 
 class VideoStreamCV2(object):
     def __init__(self, **kwargs):
@@ -21,10 +31,13 @@ class VideoStreamCV2(object):
         
         # Makes sure video streaming is thread-safe
         self.lock = threading.Lock()
+        
+        logger.info('OpenCV VideoCapture created.')
 
         
     def __del__(self):
         self.cap.release()
+        logger.info('OpenCV VideoCapture destructed.')
         
         
     def __iter__(self):
@@ -56,12 +69,16 @@ class VideoStreamPiCam(object):
         
         # Makes sure video streaming is thread-safe
         self.lock = threading.Lock()
+        
+        logger.info('PiCamera created.')
+        
 
         
     def __del__(self):
         self.stream.close()
         self.camera.stop_preview() 
         self.camera.close()
+        logger.info('PiCamera destructed.')
         
         
     def __iter__(self):

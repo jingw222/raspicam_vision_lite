@@ -1,21 +1,43 @@
+import sys
+import logging
 import cv2
 import multiprocessing as mp
 
 
 TOP_K = 5
 
+logging.basicConfig(
+    stream=sys.stdout,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt=' %I:%M:%S ',
+    level="INFO"
+)
+logger = logging.getLogger(__name__)
+
+logger.info('Only top {} labels will be showed'.format(TOP_K))
+
 def gen(camera, model):
     
     def inference(frame_in_queue, label_out_queue):
+        
+        def preds_to_text(preds, top=TOP_K):
+            top_indices = preds.argsort()[-top:][::-1]
+            result = [(model.labels[i], preds[i]) for i in top_indices] # (labels, scores)
+            result.sort(key=lambda x: x[1], reverse=True)    
+            
+            text = ''
+            for item in result:
+                s = '{}: {}\t'.format(*item)
+                text += s
+            return text
+        
+        
         while True:
             if not frame_in_queue.empty():
                 frame = frame_in_queue.get()
-                label = model.inference(frame, TOP_K)
+                preds = model.inference(frame)
                 
-                text = ''
-                for item in label:
-                    s = '{}: {}\t'.format(*item)
-                    text += s
+                text = preds_to_text(preds, TOP_K)
                 label_out_queue.put(text)
 
     
@@ -24,6 +46,8 @@ def gen(camera, model):
     label_out_queue = mp.Queue(maxsize=1)
     p = mp.Process(target=inference, args=(frame_in_queue, label_out_queue,), daemon=True)
     p.start()
+    logger.info('Started a child process {} for inferencing.'.format(p.name))
+    
     
     # Sets properties for label overlays on frames
     FONT_FACE = cv2.FONT_HERSHEY_PLAIN

@@ -1,7 +1,17 @@
+import sys
+import logging
 import cv2
 import numpy as np
 import tensorflow as tf
 
+
+logging.basicConfig(
+    stream=sys.stdout,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt=' %I:%M:%S ',
+    level="INFO"
+)
+logger = logging.getLogger(__name__)
 
 class TFLiteInterpreter(object):
     def __init__(self, model_path, labels_path):
@@ -12,6 +22,10 @@ class TFLiteInterpreter(object):
         self.IMG_WIDTH, self.IMG_HEIGHT = self.input_details[0].get('shape')[1:3]
         self.DTYPE = self.input_details[0].get('dtype')
         self.QUANT = self.input_details[0].get('quantization')
+        
+        logger.info('Loaded model from file {}'.format(model_path))
+        logger.info('Loaded label from file {}'.format(labels_path))
+        logger.info('Model interpreter details:\n input_details: {}\n output_details: {}'.format(self.input_details, self.output_details))
         
         def load_labels(path):
             with open(path, 'r', newline='\n') as f:
@@ -29,13 +43,9 @@ class TFLiteInterpreter(object):
         return x
     
     
-    def inference(self, image, top=5):
+    def inference(self, image):
         image = self.pre_process(image)
         self.interpreter.set_tensor(self.input_details[0]['index'], image.astype(self.DTYPE))
         self.interpreter.invoke()
         preds = self.interpreter.get_tensor(self.output_details[0]['index'])[0]
-
-        top_indices = preds.argsort()[-top:][::-1]
-        result = [(self.labels[i], preds[i]) for i in top_indices] # (labels, scores)
-        result.sort(key=lambda x: x[1], reverse=True)
-        return result
+        return preds
