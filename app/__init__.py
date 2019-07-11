@@ -22,11 +22,10 @@ basepath = os.path.dirname(__file__)
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
-    config[config_name].init_app(app)
     
     # Builds a camera instance
-    camera = VideoStreamPiCam()
-
+    camera = VideoStreamPiCam()   
+    
     @app.before_first_request
     def fetch_model_dir():
         model_dir = os.path.join(basepath, 'models')
