@@ -1,15 +1,16 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Raspberry Pi Live Streaming </title>
   </head>
-  <body>
-    <h1>Raspberry Pi Live Streaming </h1>
+  <body style="background-color: black;">
+    <h1 style="color:white;">Raspberry Pi Live Streaming </h1>
       
       <div style="width:100%; height: 30px">
           
         <form name="candidates" action="{{ url_for('index') }}" method='POST'>
-          <label for="candidates" style="font-family: 'Helvetica';">Model Version: </label>
-          <select id="candidates" name="candidates" type="text">
+          <label for="candidates" style="font-family: 'Courier'; font-size : 13px; color: white;">Model Version:</label>
+          <select id="candidates" name="candidates" type="text" style="font-family: 'Courier'; border: none;">
               
             {% for ver in candidates %}
               
@@ -18,7 +19,7 @@
             {% endfor %}
               
           </select>
-          <button type="submit" style="font-family: 'Helvetica'; color: white; background-color: BlueViolet; border-radius: 6px;">SUBMIT</button>
+          <button type="submit" style="font-family: 'Courier'; font-size : 13px; color: white; background-color: royalblue; border-radius: 6px; border: none;">SUBMIT</button>
         </form>
         
       </div>
