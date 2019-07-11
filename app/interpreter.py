@@ -1,5 +1,6 @@
 import sys
 import logging
+import time
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -12,6 +13,15 @@ logging.basicConfig(
     level="INFO"
 )
 logger = logging.getLogger(__name__)
+
+def timeit(func):
+    def timed(*args, **kwargs):
+        start_time = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed_time = '{:0.1f} ms'.format(1000 * (time.perf_counter() - start_time))
+        return result, elapsed_time
+    return timed
+
 
 class TFLiteInterpreter(object):
     def __init__(self, model_path, labels_path):
@@ -43,6 +53,7 @@ class TFLiteInterpreter(object):
         return x
     
     
+    @timeit
     def inference(self, image):
         image = self.pre_process(image)
         self.interpreter.set_tensor(self.input_details[0]['index'], image.astype(self.DTYPE))

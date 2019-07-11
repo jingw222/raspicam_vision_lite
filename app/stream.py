@@ -18,12 +18,13 @@ logger.info('Only top {} labels will be showed'.format(TOP_K))
 
 def gen(camera, model):
     
-    def inference(frame_in_queue, label_out_queue):
+    def get_inference(frame_in_queue, label_out_queue):
         
-        def preds_to_text(preds, top=TOP_K):
+        def preds_to_text(preds, elapsed_time, top=TOP_K):
             top_indices = preds.argsort()[-top:][::-1]
             result = [(model.labels[i], preds[i]) for i in top_indices] # (labels, scores)
-            result.sort(key=lambda x: x[1], reverse=True)    
+            result.sort(key=lambda x: x[1], reverse=True)
+            result.insert(0, ('Elapsed time', elapsed_time))
             
             text = ''
             for item in result:
@@ -35,16 +36,16 @@ def gen(camera, model):
         while True:
             if not frame_in_queue.empty():
                 frame = frame_in_queue.get()
-                preds = model.inference(frame)
+                preds, elapsed_time = model.inference(frame)
                 
-                text = preds_to_text(preds, TOP_K)
+                text = preds_to_text(preds, elapsed_time, TOP_K)
                 label_out_queue.put(text)
 
     
     # Creates a child process dedicated for model inferencing
     frame_in_queue = mp.Queue(maxsize=1)
     label_out_queue = mp.Queue(maxsize=1)
-    p = mp.Process(target=inference, args=(frame_in_queue, label_out_queue,), daemon=True)
+    p = mp.Process(target=get_inference, args=(frame_in_queue, label_out_queue,), daemon=True)
     p.start()
     logger.info('Started a child process {} for inferencing.'.format(p.name))
     
@@ -59,7 +60,7 @@ def gen(camera, model):
     ALPHA = 0.6
     ANCHOR = (20, 20)
     (_, text_height), _ = cv2.getTextSize('test text', FONT_FACE, FONT_SCALE, THICKNESS)
-    rectangle_shape = (260, text_height*(2*TOP_K+3))
+    rectangle_shape = (260, text_height*(2*(TOP_K+2)+1))
     
     # Starts generating video frames indefinitely
     label_text_last = ''
