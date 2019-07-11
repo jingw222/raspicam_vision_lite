@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 import time
@@ -14,6 +15,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+basepath = os.path.dirname(__file__)
+
 def timeit(func):
     def timed(*args, **kwargs):
         start_time = time.perf_counter()
@@ -24,17 +27,22 @@ def timeit(func):
 
 
 class TFLiteInterpreter(object):
-    def __init__(self, model_path, labels_path):
-        self.interpreter = tf.lite.Interpreter(model_path)
+    def __init__(self, target):
+        self.target = target
+        self.model_path = os.path.join(basepath, 'models', target, '{}.tflite'.format(target))
+        self.label_path = os.path.join(basepath, 'models', target, 'labels.txt')
+        
+        self.interpreter = tf.lite.Interpreter(self.model_path)
         self.interpreter.allocate_tensors()
+        
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
         self.IMG_WIDTH, self.IMG_HEIGHT = self.input_details[0].get('shape')[1:3]
         self.DTYPE = self.input_details[0].get('dtype')
         self.QUANT = self.input_details[0].get('quantization')
         
-        logger.info('Loaded model from file {}'.format(model_path))
-        logger.info('Loaded label from file {}'.format(labels_path))
+        logger.info('Loaded model from file {}'.format(self.model_path))
+        logger.info('Loaded label from file {}'.format(self.label_path))
         logger.info('Model interpreter details:\n input_details: {}\n output_details: {}'.format(self.input_details, self.output_details))
         
         def load_labels(path):
@@ -43,7 +51,7 @@ class TFLiteInterpreter(object):
                 labels = [item.rstrip('\n') for item in labels]
             return labels        
         
-        self.labels = load_labels(labels_path)
+        self.labels = load_labels(self.label_path)
         
         
     def pre_process(self, x):

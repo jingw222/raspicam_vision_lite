@@ -12,43 +12,57 @@ logging.basicConfig(
     datefmt=' %I:%M:%S ',
     level="INFO"
 )
+
 logger = logging.getLogger(__name__)
 
-logger.info('Only top {} labels will be showed'.format(TOP_K))
+mplogger = mp.log_to_stderr(logging.INFO)
+
+# Sets up two Queues dedicated for video streaming vs model inferencing asynchronously
+frame_in_queue = mp.Queue(maxsize=1)
+label_out_queue = mp.Queue(maxsize=1)
+
+
+def get_inference(model, input_queue, output_queue):
+
+    def preds_to_text(preds, elapsed_time, top=TOP_K):
+        top_indices = preds.argsort()[-top:][::-1]
+        result = [(model.labels[i], preds[i]) for i in top_indices] # (labels, scores)
+        result.sort(key=lambda x: x[1], reverse=True)
+        result.insert(0, ('Elapsed time', elapsed_time))
+
+        text = ''
+        for item in result:
+            s = '{}: {}\t'.format(*item)
+            text += s
+        return text
+
+    while True:
+        if not input_queue.empty():
+            # Gets frame from the input queue if exists
+            frame = input_queue.get()
+            preds, elapsed_time = model.inference(frame)
+
+            # Ouputs predictions in plain text onto the output queue
+            text = preds_to_text(preds, elapsed_time, TOP_K)
+            if output_queue.empty():
+                output_queue.put(text)
+
 
 def gen(camera, model):
     
-    def get_inference(frame_in_queue, label_out_queue):
-        
-        def preds_to_text(preds, elapsed_time, top=TOP_K):
-            top_indices = preds.argsort()[-top:][::-1]
-            result = [(model.labels[i], preds[i]) for i in top_indices] # (labels, scores)
-            result.sort(key=lambda x: x[1], reverse=True)
-            result.insert(0, ('Elapsed time', elapsed_time))
-            
-            text = ''
-            for item in result:
-                s = '{}: {}\t'.format(*item)
-                text += s
-            return text
-        
-        
-        while True:
-            if not frame_in_queue.empty():
-                frame = frame_in_queue.get()
-                preds, elapsed_time = model.inference(frame)
-                
-                text = preds_to_text(preds, elapsed_time, TOP_K)
-                label_out_queue.put(text)
+    # Terminates existing children processes
+    p_active_children = mp.active_children()
+    if p_active_children:
+        for p_ac in p_active_children:
+            p_ac.terminate()
+            p_ac.join()
+            mplogger.info('Terminated child process {} (pid {}).'.format(p_ac.name, p_ac.pid))
 
-    
-    # Creates a child process dedicated for model inferencing
-    frame_in_queue = mp.Queue(maxsize=1)
-    label_out_queue = mp.Queue(maxsize=1)
-    p = mp.Process(target=get_inference, args=(frame_in_queue, label_out_queue,), daemon=True)
+    # Initiates a new child process
+    daemon_name = 'TFLiteInterpreterDaemon_{}'.format(model.target)
+    p = mp.Process(name=daemon_name, target=get_inference, args=(model, frame_in_queue, label_out_queue), daemon=True)
     p.start()
-    logger.info('Started a child process {} for inferencing.'.format(p.name))
-    
+    mplogger.info('Started child process {} (pid {}).'.format(p.name, p.pid))
     
     # Sets properties for label overlays on frames
     FONT_FACE = cv2.FONT_HERSHEY_PLAIN

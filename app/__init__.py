@@ -5,6 +5,7 @@ from flask import Flask, Response, render_template, request, session, redirect, 
 from .camera import VideoStreamCV2, VideoStreamPiCam
 from .interpreter import TFLiteInterpreter
 from .stream import gen
+from config import config
 
 
 logging.basicConfig(
@@ -13,31 +14,39 @@ logging.basicConfig(
     datefmt=' %I:%M:%S ',
     level="INFO"
 )
+
 logger = logging.getLogger(__name__)
 
 basepath = os.path.dirname(__file__)
 
-def create_app():
+def create_app(config_name):
     app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
     
+    # Builds a camera instance
     camera = VideoStreamPiCam()
 
-    @app.route('/', methods=['GET', 'POST'])
-    def index():
+    @app.before_first_request
+    def fetch_model_dir():
         model_dir = os.path.join(basepath, 'models')
         logger.info('Fetched model candidates from directory {}'.format(model_dir))
         
         candidates = [d for d in next(os.walk(model_dir))[1] if not d.startswith('.')]
+        session['candidates'] = candidates
+        return
+    
+    
+    @app.route('/', methods=['GET', 'POST'])
+    def index():
         target = request.form.get("candidates")
         logger.info('Selected model: {}'.format(target))
-        return render_template('index.html', candidates=candidates, target=target)
+        return render_template('index.html', candidates=session.get('candidates'), target=target)
 
 
     @app.route('/videostream/<target>', methods=['GET', 'POST'])
     def videostream(target):
-        model_path = os.path.join(basepath, 'models', target, '{}.tflite'.format(target))
-        label_path = os.path.join(basepath, 'models', target, 'labels.txt')
-        model = TFLiteInterpreter(model_path, label_path)
+        model = TFLiteInterpreter(target)
         return Response(gen(camera, model),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
     
