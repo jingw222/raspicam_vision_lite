@@ -67,7 +67,8 @@ def gen(camera, model):
     # Sets properties for label overlays on frames
     FONT_FACE = cv2.FONT_HERSHEY_PLAIN
     FONT_SCALE = 1
-    FONT_COLOR = (255, 255, 255)
+    FONT_COLOR_HEADER = (8, 109, 252)
+    FONT_COLOR_LABEL = (255, 255, 255)
     THICKNESS = 1
     LINE_TYPE = cv2.LINE_AA
     REC_COLOR = (64, 64, 64)
@@ -95,6 +96,10 @@ def gen(camera, model):
         if label_text_last:
             overlay = cv2.rectangle(overlay, ANCHOR, rectangle_shape, REC_COLOR, -1)
             for i, text in enumerate(label_text_last):
+                if i == 0:
+                    FONT_COLOR = FONT_COLOR_HEADER
+                else:
+                    FONT_COLOR = FONT_COLOR_LABEL
                 text_pos = (ANCHOR[0]+text_height, ANCHOR[1]+2*(i+1)*text_height)
                 overlay = cv2.putText(overlay, text, text_pos, FONT_FACE, FONT_SCALE, FONT_COLOR, THICKNESS, LINE_TYPE)
             overlay = cv2.addWeighted(frame, ALPHA, overlay, 1 - ALPHA, 0)

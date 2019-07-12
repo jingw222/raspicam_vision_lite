@@ -26,20 +26,18 @@ def create_app(config_name):
     # Builds a camera instance
     camera = VideoStreamPiCam()   
     
-    @app.before_first_request
-    def fetch_model_dir():
-        model_dir = os.path.join(basepath, 'models')
-        logger.info('Fetched model candidates from directory {}'.format(model_dir))
-        
-        candidates = [d for d in next(os.walk(model_dir))[1] if not d.startswith('.')]
-        session['candidates'] = candidates
-        return
-    
-    
     @app.route('/', methods=['GET', 'POST'])
     def index():
+        logger.info('Request from User-Agent: {}'.format(request.headers.get('User-Agent')))
+        
+        if session.get('candidates') is None:
+            model_dir = os.path.join(basepath, 'models')
+            candidates = [d for d in next(os.walk(model_dir))[1] if not d.startswith('.')]
+            logger.info('Fetched model candidates from directory {}'.format(model_dir))
+            session['candidates'] = candidates
+            
         target = request.form.get("candidates")
-        logger.info('Selected model: {}'.format(target))
+        logger.info('Submitted model: {}'.format(target))
         return render_template('index.html', candidates=session.get('candidates'), target=target)
 
 
