@@ -6,4 +6,7 @@ tf1-py35
 *.py[cod]
 *.log
 instance/
-models/
+rpi_camera_webstream.py
+**/models/*/*
+!*.tflite
+!labels.txt
