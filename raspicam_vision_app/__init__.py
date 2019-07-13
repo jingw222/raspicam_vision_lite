@@ -28,15 +28,17 @@ def create_app(config_name):
 
     @app.route('/', methods=['GET', 'POST'])
     def index():
-        logger.info('Request from User-Agent: {}'.format(request.headers.get('User-Agent')))
-        
         if session.get('candidates') is None:
             model_dir = os.path.join(basepath, 'models')
             candidates = [d for d in next(os.walk(model_dir))[1] if not d.startswith('.')]
             logger.info('Fetched model candidates from directory {}'.format(model_dir))
             session['candidates'] = candidates
 
+        if request.method == 'GET':
+            logger.info('Model served: {}'.format(session.get('target')))
+            
         if request.method == 'POST':
+            logger.info('Request from User-Agent: {}'.format(request.headers.get('User-Agent')))
             target = request.form.get("target")
             if session.get('target') is not None and session.get('target')==target:
                 logger.info('Submitted model not changed')
@@ -46,13 +48,26 @@ def create_app(config_name):
                 logger.info('Submitted model: {}'.format(target))
         return render_template('index.html', candidates=session.get('candidates'), target=session.get('target'))
     
+    
     @app.route('/videostream/<target>', methods=['GET', 'POST'])
     def videostream(target):
         model = TFLiteInterpreter(target)
         return Response(gen(camera, model),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
+    def shutdown_server():
+        shutdown = request.environ.get('werkzeug.server.shutdown')
+        if shutdown is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        shutdown()
+
+        
+    @app.route('/shutdown', methods=['POST'])
+    def shutdown():
+        if request.method == 'POST':
+            shutdown_server()
+            return 'Server shutting down.'    
     
-
-
+    
     return app

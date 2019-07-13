@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta name="viewport" charset="UTF-8" content="width=device-width, initial-scale=1.0">
+    <title>RasPiCam Vision Lite </title>
+</head>
+
+<body style="background-color: #212121; margin: 20px">
+
+    <header>
+        <h1 align="left" ><a style="color:white; inline-block;" href="https://github.com/jingw222">RasPiCam Vision Lite </a></h1>
+    </header>
+
+    <div style="width:100%; height: 30px;">
+        <form name="target" action="{{ url_for('index') }}" method='POST' style="display:inline-block;" >
+            <label for="target" style="font-family: 'Courier'; font-size : 14px; color: white;">Model Version:</label>
+            <select id="target" name="target" type="text" style="font-family: 'Courier'; font-size : 14px; border: none;" required>
+                <option value="" selected disabled> -- Select -- </option>
+                
+                {% for ver in candidates %}
+
+                <option value="{{ver}}" {% if ver == target %} selected {% endif %}>{{ver}}</option>
+
+                {% endfor %}
+
+            </select>
+
+            <button type="reset" name="reset_button"
+                style="font-family: 'Courier'; font-size : 14px; color: white; background-color: #fc6408; border-radius: 6px; border: none;">RESET</button>  
+            <button type="submit" name="submit_button"
+                style="font-family: 'Courier'; font-size : 14px; color: white; background-color: royalblue; border-radius: 6px; border: none;">SUBMIT</button>
+        </form>
+        <div style="width:20px; height:auto; display:inline-block;"></div>
+        <form name="shutdown" action="{{ url_for('shutdown') }}" method="POST" style="display:inline-block;">
+            <button type="submit" name="shutdown_button"  style="font-family: 'Courier'; font-size : 14px; color: black; background-color: white; border-radius: 6px; border: none;">SHUTDOWN SERVER</button> 
+        </form>
+    </div>
+
+    <div>
+        {% if target is not none %}
+
+        <img style="vertical-align: middle" src="{{ url_for('videostream', target=target) }}">
+
+        {% else %}
+
+        <p style="font-family: 'Courier'; font-style: oblique; color: #fc6408;">Please submit a model to get started.</p>
+
+        {% endif %}
+    </div>
+
+</body>
+
+<footer style="position: absolute; bottom: 20; border-top:1px solid lightgrey;">
+    <div>
+        <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">Powered by </p>
+        <p style="display: inline;"><a style="font-family: 'Roboto'; font-weight:bold; color:#fc6408; display: inline; font-size : 14px;"
+                href="https://www.tensorflow.org/lite">TensorFlow Lite</a></p>
+        <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">& </p>
+        <p style="display: inline;"><a style="font-family: 'Droid Serif'; font-weight:bold; color:#396179; display: inline; font-size : 14px;"
+                href="https://palletsprojects.com/p/flask">Flask</a></p>        
+        <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">with &#x1F496</p>
+    </div>
+    <small style="font-family: 'Arial'; font-style: oblique; color:dimgray;">&copy; 2019 James Wong All Rights Reserved </small>
+</footer>
+
+</html>
