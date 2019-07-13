@@ -28,12 +28,10 @@ def get_inference(model, input_queue, output_queue):
         top_indices = preds.argsort()[-top:][::-1]
         result = [(model.labels[i], preds[i]) for i in top_indices] # (labels, scores)
         result.sort(key=lambda x: x[1], reverse=True)
+        
         result.insert(0, ('Elapsed time', elapsed_time))
+        text = ['{}: {}'.format(*item) for item in result]
 
-        text = ''
-        for item in result:
-            s = '{}: {}\t'.format(*item)
-            text += s
         return text
 
     while True:
@@ -78,7 +76,7 @@ def gen(camera, model):
     rectangle_shape = (260, text_height*(2*(TOP_K+2)+1))
     
     # Starts generating video frames indefinitely
-    label_text_last = ''
+    label_text = ''
     while True:
         frame = next(camera)
         overlay = frame.copy()
@@ -89,13 +87,12 @@ def gen(camera, model):
             
         # Fetches the results from label_out_queue, if the output queue is not empty
         if not label_out_queue.empty():
-            label_text = label_out_queue.get().split('\t')
-            label_text_last = label_text
+            label_text = label_out_queue.get()
         
         # Draws label overlays
-        if label_text_last:
+        if label_text:
             overlay = cv2.rectangle(overlay, ANCHOR, rectangle_shape, REC_COLOR, -1)
-            for i, text in enumerate(label_text_last):
+            for i, text in enumerate(label_text):
                 if i == 0:
                     FONT_COLOR = FONT_COLOR_HEADER
                 else:

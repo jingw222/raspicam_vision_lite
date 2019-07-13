@@ -24,8 +24,8 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     
     # Builds a camera instance
-    camera = VideoStreamPiCam()   
-    
+    camera = VideoStreamPiCam()
+
     @app.route('/', methods=['GET', 'POST'])
     def index():
         logger.info('Request from User-Agent: {}'.format(request.headers.get('User-Agent')))
@@ -35,16 +35,24 @@ def create_app(config_name):
             candidates = [d for d in next(os.walk(model_dir))[1] if not d.startswith('.')]
             logger.info('Fetched model candidates from directory {}'.format(model_dir))
             session['candidates'] = candidates
-            
-        target = request.form.get("candidates")
-        logger.info('Submitted model: {}'.format(target))
-        return render_template('index.html', candidates=session.get('candidates'), target=target)
 
-
+        if request.method == 'POST':
+            target = request.form.get("target")
+            if session.get('target') is not None and session.get('target')==target:
+                logger.info('Submitted model not changed')
+                return '', 204
+            else:
+                session['target'] = target
+                logger.info('Submitted model: {}'.format(target))
+        return render_template('index.html', candidates=session.get('candidates'), target=session.get('target'))
+    
     @app.route('/videostream/<target>', methods=['GET', 'POST'])
     def videostream(target):
         model = TFLiteInterpreter(target)
         return Response(gen(camera, model),
                         mimetype='multipart/x-mixed-replace; boundary=frame')
+
     
+
+
     return app
