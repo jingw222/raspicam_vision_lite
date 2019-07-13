@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-from flask import Flask, Response, render_template, request, session, redirect, url_for
+from flask import Flask, Response, render_template, request, session, flash
 from .camera import VideoStreamCV2, VideoStreamPiCam
 from .interpreter import TFLiteInterpreter
 from .stream import gen
@@ -41,11 +41,11 @@ def create_app(config_name):
             logger.info('Request from User-Agent: {}'.format(request.headers.get('User-Agent')))
             target = request.form.get("target")
             if session.get('target') is not None and session.get('target')==target:
-                logger.info('Submitted model not changed')
+                logger.info('Served model not changed')
                 return '', 204
             else:
                 session['target'] = target
-                logger.info('Submitted model: {}'.format(target))
+                logger.info('Serving model: {}'.format(target))
         return render_template('index.html', candidates=session.get('candidates'), target=session.get('target'))
     
     
@@ -60,14 +60,17 @@ def create_app(config_name):
         shutdown = request.environ.get('werkzeug.server.shutdown')
         if shutdown is None:
             raise RuntimeError('Not running with the Werkzeug Server')
+        session.clear()
+        logger.info('Session cleared.')
         shutdown()
+        logger.info('Server shut down.')
 
         
     @app.route('/shutdown', methods=['POST'])
     def shutdown():
         if request.method == 'POST':
             shutdown_server()
-            return 'Server shutting down.'    
+            return 'Server shut down. <a href="/">Back home</a> and restart.'    
     
     
     return app

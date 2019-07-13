@@ -17,7 +17,7 @@
         <form name="target" action="{{ url_for('index') }}" method='POST' style="display:inline-block;" >
             <label for="target" style="font-family: 'Courier'; font-size : 14px; color: white;">Model Version:</label>
             <select id="target" name="target" type="text" style="font-family: 'Courier'; font-size : 14px; border: none;" required>
-                <option value="" selected disabled> -- Select -- </option>
+                <option value="" selected disabled> -- SELECT -- </option>
                 
                 {% for ver in candidates %}
 
@@ -28,13 +28,13 @@
             </select>
 
             <button type="reset" name="reset_button"
-                style="font-family: 'Courier'; font-size : 14px; color: white; background-color: #fc6408; border-radius: 6px; border: none;">RESET</button>  
+                style="font-family: 'Courier'; font-size : 14px; color: black; background-color: white; border-radius: 6px; border: none;">RESET</button>  
             <button type="submit" name="submit_button"
-                style="font-family: 'Courier'; font-size : 14px; color: white; background-color: royalblue; border-radius: 6px; border: none;">SUBMIT</button>
+                style="font-family: 'Courier'; font-size : 14px; color: white; background-color: royalblue; border-radius: 6px; border: none;">SERVE</button>
         </form>
-        <div style="width:20px; height:auto; display:inline-block;"></div>
+        <div style="width:10px; height:auto; display:inline-block;"></div>
         <form name="shutdown" action="{{ url_for('shutdown') }}" method="POST" style="display:inline-block;">
-            <button type="submit" name="shutdown_button"  style="font-family: 'Courier'; font-size : 14px; color: black; background-color: white; border-radius: 6px; border: none;">SHUTDOWN SERVER</button> 
+            <button type="button" name="shutdown_button" onClick="confirmMessage(this.form);" style="font-family: 'Courier'; font-size : 14px; color: black; background-color: #fc6408; border-radius: 6px; border: none;"><strong>SHUTDOWN</strong></button> 
         </form>
     </div>
 
@@ -45,22 +45,29 @@
 
         {% else %}
 
-        <p style="font-family: 'Courier'; font-style: oblique; color: #fc6408;">Please submit a model to get started.</p>
+        <p style="font-family: 'Courier'; font-style: oblique; color: #fc6408;">PLEASE SELECT YOUR MODEL TO SERVE.</p>
 
         {% endif %}
     </div>
 
+    <script type="text/javascript">
+        function confirmMessage(form) {
+            if (confirm("Are you sure you want to shutdown the server?")) {
+                form.submit();
+            }
+        }
+    </script>
 </body>
 
 <footer style="position: absolute; bottom: 20; border-top:1px solid lightgrey;">
     <div>
-        <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">Powered by </p>
+        <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">Devotedly powered by </p>
         <p style="display: inline;"><a style="font-family: 'Roboto'; font-weight:bold; color:#fc6408; display: inline; font-size : 14px;"
                 href="https://www.tensorflow.org/lite">TensorFlow Lite</a></p>
         <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">& </p>
         <p style="display: inline;"><a style="font-family: 'Droid Serif'; font-weight:bold; color:#396179; display: inline; font-size : 14px;"
                 href="https://palletsprojects.com/p/flask">Flask</a></p>        
-        <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">with &#x1F496</p>
+        <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">with &#x1F353</p>
     </div>
     <small style="font-family: 'Arial'; font-style: oblique; color:dimgray;">&copy; 2019 James Wong All Rights Reserved </small>
 </footer>

@@ -62,18 +62,20 @@ class VideoStreamPiCam(object):
         
         # Starts preview and prepares to capture images continuously to stream
         self.camera.start_preview()
-
+        logger.info('PiCamera created.')
+        
         self.cap = self.camera.capture_continuous(self.stream, format='bgr', use_video_port=True)
+        logger.info('Streamer created.')
         
         # Makes sure video streaming is thread-safe
         self.lock = threading.Lock()
         
-        logger.info('PiCamera created.')
-        
 
-        
     def __del__(self):
+        self.cap.close()
         self.stream.close()
+        logger.info('Streamer closed.')
+
         self.camera.stop_preview() 
         self.camera.close()
         logger.info('PiCamera destructed.')

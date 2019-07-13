@@ -33,6 +33,8 @@ class TFLiteInterpreter(object):
         self.label_path = os.path.join(basepath, 'models', target, 'labels.txt')
         
         self.interpreter = tf.lite.Interpreter(self.model_path)
+        logger.info('Loaded model from file {}'.format(self.model_path))
+        
         self.interpreter.allocate_tensors()
         
         self.input_details = self.interpreter.get_input_details()
@@ -40,10 +42,7 @@ class TFLiteInterpreter(object):
         self.IMG_WIDTH, self.IMG_HEIGHT = self.input_details[0].get('shape')[1:3]
         self.DTYPE = self.input_details[0].get('dtype')
         self.QUANT = self.input_details[0].get('quantization')
-        
-        logger.info('Loaded model from file {}'.format(self.model_path))
-        logger.info('Loaded label from file {}'.format(self.label_path))
-        logger.info('Model interpreter details:\n input_details: {}\n output_details: {}'.format(self.input_details, self.output_details))
+        logger.debug('Model interpreter details:\n input_details: {}\n output_details: {}'.format(self.input_details, self.output_details))
         
         def load_labels(path):
             with open(path, 'r', newline='\n') as f:
@@ -52,19 +51,19 @@ class TFLiteInterpreter(object):
             return labels        
         
         self.labels = load_labels(self.label_path)
+        logger.info('Loaded label from file {}'.format(self.label_path))
         
         
     def pre_process(self, x):
-        x = cv2.cvtColor(x, cv2.COLOR_BGR2RGB)
         x = cv2.resize(x, (self.IMG_WIDTH, self.IMG_HEIGHT))
         x = np.expand_dims(x, axis=0)
         return x
     
     
     @timeit
-    def inference(self, image):
-        image = self.pre_process(image)
-        self.interpreter.set_tensor(self.input_details[0]['index'], image.astype(self.DTYPE))
+    def inference(self, x):
+        x = self.pre_process(x)
+        self.interpreter.set_tensor(self.input_details[0]['index'], x.astype(self.DTYPE))
         self.interpreter.invoke()
         preds = self.interpreter.get_tensor(self.output_details[0]['index'])[0]
         return preds
