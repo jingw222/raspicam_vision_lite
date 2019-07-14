@@ -33,9 +33,6 @@ def create_app(config_name):
             candidates = [d for d in next(os.walk(model_dir))[1] if not d.startswith('.')]
             logger.info('Fetched model candidates from directory {}'.format(model_dir))
             session['candidates'] = candidates
-
-        if request.method == 'GET':
-            logger.info('Model served: {}'.format(session.get('target')))
             
         if request.method == 'POST':
             logger.info('Request from User-Agent: {}'.format(request.headers.get('User-Agent')))

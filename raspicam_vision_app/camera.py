@@ -52,12 +52,11 @@ class VideoStreamCV2(object):
         
 class VideoStreamPiCam(object):
     def __init__(self, **kwargs):
-        # Sets camera properties
-        self.resolution = (WIDTH, HEIGHT)
-        self.framerate = FRAMERATE
         
         # Initiates a picamera object
-        self.camera = picamera.PiCamera(resolution=self.resolution, framerate=self.framerate, **kwargs)
+        self.camera = picamera.PiCamera(resolution=(WIDTH, HEIGHT), framerate=FRAMERATE, **kwargs)
+        logger.info('PiCamera specs: resolution={} framerate={}'.format(self.camera.resolution, self.camera.framerate))
+        
         self.stream = picamera.array.PiRGBArray(self.camera)
         
         # Starts preview and prepares to capture images continuously to stream
@@ -90,7 +89,6 @@ class VideoStreamPiCam(object):
             while not self.camera.closed:
                 self.stream.truncate()
                 self.stream.seek(0)
-                # Gets frames from camera
-                frame = next(self.cap)
-                return frame.array
+                # Gets a frame as an array from camera
+                return next(self.cap).array
     

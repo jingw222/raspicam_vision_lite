@@ -39,7 +39,7 @@ class TFLiteInterpreter(object):
         
         self.input_details = self.interpreter.get_input_details()
         self.output_details = self.interpreter.get_output_details()
-        self.IMG_WIDTH, self.IMG_HEIGHT = self.input_details[0].get('shape')[1:3]
+        self.WIDTH, self.HEIGHT = self.input_details[0].get('shape')[1:3]
         self.DTYPE = self.input_details[0].get('dtype')
         self.QUANT = self.input_details[0].get('quantization')
         logger.debug('Model interpreter details:\n input_details: {}\n output_details: {}'.format(self.input_details, self.output_details))
@@ -52,10 +52,18 @@ class TFLiteInterpreter(object):
         
         self.labels = load_labels(self.label_path)
         logger.info('Loaded label from file {}'.format(self.label_path))
+
+        
+    def crop_square(self, x):
+        h, w, _ = x.shape
+        w_new = h
+        startw = w//2-(w_new//2)
+        return x[:, startw:startw+w_new]
         
         
     def pre_process(self, x):
-        x = cv2.resize(x, (self.IMG_WIDTH, self.IMG_HEIGHT))
+        # x = self.crop_square(x)
+        x = cv2.resize(x, (self.WIDTH, self.HEIGHT))
         x = np.expand_dims(x, axis=0)
         return x
     
