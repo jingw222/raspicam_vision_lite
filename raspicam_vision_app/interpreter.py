@@ -29,20 +29,20 @@ def timeit(func):
 class TFLiteInterpreter(object):
     def __init__(self, target):
         self.target = target
-        self.model_path = os.path.join(basepath, 'models', target, '{}.tflite'.format(target))
-        self.label_path = os.path.join(basepath, 'models', target, 'labels.txt')
+        self.MODEL_PATH = os.path.join(basepath, 'models', target, '{}.tflite'.format(target))
+        self.LABEL_PATH = os.path.join(basepath, 'models', target, 'labels.txt')
         
-        self.interpreter = tf.lite.Interpreter(self.model_path)
-        logger.info('Loaded model from file {}'.format(self.model_path))
+        self.interpreter = tf.lite.Interpreter(self.MODEL_PATH)
+        logger.info('Loaded model from file {}'.format(self.MODEL_PATH))
         
         self.interpreter.allocate_tensors()
         
-        self.input_details = self.interpreter.get_input_details()
-        self.output_details = self.interpreter.get_output_details()
-        self.WIDTH, self.HEIGHT = self.input_details[0].get('shape')[1:3]
-        self.DTYPE = self.input_details[0].get('dtype')
-        self.QUANT = self.input_details[0].get('quantization')
-        logger.debug('Model interpreter details:\n input_details: {}\n output_details: {}'.format(self.input_details, self.output_details))
+        self.INPUT_DETAILS = self.interpreter.get_input_details()
+        self.OUTPUT_DETAILS = self.interpreter.get_output_details()
+        self.INPUT_WIDTH, self.INPUT_HEIGHT = self.INPUT_DETAILS[0].get('shape')[1:3]
+        self.INPUT_DTYPE = self.INPUT_DETAILS[0].get('dtype')
+        self.INPUT_QUANT = self.INPUT_DETAILS[0].get('quantization')
+        logger.debug('Model interpreter details:\n input_details: {}\n output_details: {}'.format(self.INPUT_DETAILS, self.OUTPUT_DETAILS))
         
         def load_labels(path):
             with open(path, 'r', newline='\n') as f:
@@ -50,8 +50,8 @@ class TFLiteInterpreter(object):
                 labels = [item.rstrip('\n') for item in labels]
             return labels        
         
-        self.labels = load_labels(self.label_path)
-        logger.info('Loaded label from file {}'.format(self.label_path))
+        self.labels = load_labels(self.LABEL_PATH)
+        logger.info('Loaded label from file {}'.format(self.LABEL_PATH))
 
         
     def crop_square(self, x):
@@ -63,7 +63,7 @@ class TFLiteInterpreter(object):
         
     def pre_process(self, x):
         # x = self.crop_square(x)
-        x = cv2.resize(x, (self.WIDTH, self.HEIGHT))
+        x = cv2.resize(x, (self.INPUT_WIDTH, self.INPUT_HEIGHT))
         x = np.expand_dims(x, axis=0)
         return x
     
@@ -71,7 +71,7 @@ class TFLiteInterpreter(object):
     @timeit
     def inference(self, x):
         x = self.pre_process(x)
-        self.interpreter.set_tensor(self.input_details[0]['index'], x.astype(self.DTYPE))
+        self.interpreter.set_tensor(self.INPUT_DETAILS[0]['index'], x.astype(self.INPUT_DTYPE))
         self.interpreter.invoke()
-        preds = self.interpreter.get_tensor(self.output_details[0]['index'])[0]
+        preds = self.interpreter.get_tensor(self.OUTPUT_DETAILS[0]['index'])[0]
         return preds
