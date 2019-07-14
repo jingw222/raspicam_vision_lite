@@ -7,13 +7,13 @@
     <title>RasPiCam Vision Lite </title>
 </head>
 
-<body style="background-color: #212121; margin: 10px; min-width:640px;" >
+<body style="background-color: #212121; margin: 0px; min-width:640px; height: 100%; padding: 0;" >
     
     <header>
         <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
         <h1 align="center"><a style="font-family: 'Indie Flower'; font-size: 32px; color:white; inline-block; text-decoration: none;" target="_blank" rel="noopener noreferrer" href="https://github.com/jingw222/raspicam_vision_app">RasPiCam Vision Lite </a></h1>
     </header>
-
+        
     <div style="width:100%; height: 30px;" align="center">
         <form name="target" action="{{ url_for('index') }}" method='POST' style="display:inline-block;" >
             <label for="target" style="font-family: 'Courier'; font-size : 14px; font-weight:bold; color: white;">Model Version:</label>
@@ -46,7 +46,7 @@
 
         {% else %}
 
-        <p></p>
+        <p style="font-family: 'Arial'; font-size: 18px; color: white; text-decoration: underline">Welcome! <br>Serve your model to get started.</p>
 
         {% endif %}
     </div>
@@ -61,7 +61,7 @@
 </body>
 
 <div align="center">
-<footer style="position: relative; bottom: -10;" align="center">
+<footer style="background: #282828; width: 100%; height: 50px; position: absolute; bottom: 0; left: 0;" align="center">
     <div align="center">
         <p style="font-family: 'Georgia'; font-size : 14px; color:lightgrey; display: inline;">Devotedly powered by </p>
         <p style="display: inline;"><a style="font-family: 'Roboto'; font-weight:bold; color:#fc6408; display: inline; font-size: 14px; text-decoration: none;"
@@ -73,7 +73,7 @@
         <a style="text-decoration: none;" target="_blank" rel="noopener noreferrer" href="https://www.raspberrypi.org">&#x1F353</a>
     </div>
     <div align="center">
-    <small style="font-family: 'Arial'; font-style: oblique; color:dimgray;" align="center">&copy; 2019 James Wong All Rights Reserved </small>
+    <small style="font-family: 'Arial'; font-style: oblique; color: #2F4F4F;" align="center">&copy; 2019 James Wong All Rights Reserved </small>
     </div>
 </footer>
 </div>
