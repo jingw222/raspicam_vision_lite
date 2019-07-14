@@ -1,8 +1,8 @@
 # RasPiCam Vision Lite
 
-RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletsprojects.com/p/flask) web app that serves on [Raspberry Pi](https://www.raspberrypi.org) and streams live video from its camera module while doing on-device image classification asynchronously with [TensorFlow Lite](https://www.tensorflow.org/lite) models. 
+RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletsprojects.com/p/flask) web app that serves on [Raspberry Pi](https://www.raspberrypi.org) and streams live video from its camera module at high framerates while doing on-device image classification asynchronously with [TensorFlow Lite](https://www.tensorflow.org/lite) models. 
 
-With RasPiCam Vision Lite, efficiently serving and comparing multiple TensorFlow Lite models for image classification is just a few clicks away.
+With RasPiCam Vision Lite, efficiently serving and comparing multiple TensorFlow Lite models for image classification is just a few clicks away. It takes advantage of multiprocessing and shifts the computational heavy lifting of inferencing into dedicated subprocesses, independent of video streaming feed. 
 
 ![demo](img/demo.png)
 
@@ -27,11 +27,11 @@ With RasPiCam Vision Lite, efficiently serving and comparing multiple TensorFlow
 
 3. Start a Flask web server by ```python3 main.py``` under repository root.
 
-4. Open a browser and go to the IP address (e.g. `192.168.0.104:5000`) distributed to Raspberry Pi in your local network. You'll be greeted by the web interface as shown above.
+4. Open a browser and go to the IP address with port 5000 (e.g. `192.168.0.104:5000`) distributed to Raspberry Pi in your local network. You'll be greeted by the web interface as shown above.
 
 5. Go select one of the models from the dropdown list, and press `SERVE` to watch video live streaming as the serving model does inferencing in the background. Try selecting a different model and tap `SERVE` again. 
 
-6. Shut down the server by clicking `SHUTDOWN`.
+6. Shut down the server safely by clicking `SHUTDOWN`.
 
 ## :strawberry:How It Works
 
