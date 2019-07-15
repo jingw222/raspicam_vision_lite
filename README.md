@@ -2,11 +2,18 @@
 
 RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletsprojects.com/p/flask) web app that serves on [Raspberry Pi](https://www.raspberrypi.org) and streams live video from its camera module at high framerates while doing on-device image classification asynchronously with [TensorFlow Lite](https://www.tensorflow.org/lite) models. 
 
-With RasPiCam Vision Lite, efficiently serving and comparing multiple TensorFlow Lite models for image classification is just a few clicks away. It takes advantage of multiprocessing and shifts the computational heavy lifting of inferencing into dedicated subprocesses, independent of video streaming feed. 
+## :strawberry:Overview
+
+With RasPiCam Vision Lite,
+
+- efficiently serving and comparing multiple TensorFlow Lite models for image classification is just a few clicks away.
+
+- you can takes advantage of multiprocessing and shifts the computational heavy lifting of inferencing into dedicated subprocesses, independent of video streaming feed. 
+
 
 ![demo](img/demo.png)
 
-## :strawberry:Overview
+
 
 
 
@@ -14,24 +21,24 @@ With RasPiCam Vision Lite, efficiently serving and comparing multiple TensorFlow
 
 1. Open a terminal, SSH into your Raspberry Pi and clone the repository.
 
-2. *(Optional)* Put your custom trained TensorFlow Lite [quantized](https://www.tensorflow.org/lite/performance/post_training_quantization) model `{your-model-version}.tflite` and labels `labels.txt` into a same separate folder `{your-model-version}/` under `models/` directory. Of course, you can still download and use some other offically released [hosted models](https://www.tensorflow.org/lite/guide/hosted_models#quantized_models) as this project does.
+2. *(Optional)* To use models other than the defaults that come with this repository, you can still download and use some other offically released [hosted models](https://www.tensorflow.org/lite/guide/hosted_models#quantized_models) as this project does. Alternatively, train your own custom TensorFlow Lite (optimally [quantized](https://www.tensorflow.org/lite/performance/post_training_quantization)) models either via transfer learning or from scratch, and then place them along with labels inside `models/` just like the rest of them:
 
-```
-.
-└─ models
-   └── {your-model-version}
-       ├── {your-model-version}.tflite
-       └── labels.txt
-```
+    ```
+    .
+    └─ models
+       └── {your-model-version}
+           ├── {your-model-version}.tflite
+           └── labels.txt
+    ```
 
 
-3. Start a Flask web server by ```python3 main.py``` under repository root.
+3. Start a Flask web server by running `python3 main.py` under the repository root.
 
-4. Open a browser and go to the IP address with port 5000 (e.g. `192.168.0.104:5000`) distributed to Raspberry Pi in your local network. You'll be greeted by the web interface as shown above.
+4. Open a browser and access the IP address distributed to Raspberry Pi in your local network with default port 5000 (e.g. 192.168.0.104:5000) . You'll be greeted by the web interface as shown above. 
 
-5. Go select one of the models from the dropdown list, and press `SERVE` to watch video live streaming as the serving model does inferencing in the background. Try selecting a different model and tap `SERVE` again. 
+5. Go select one of the models from the dropdown list, and press the **SERVE** button to watch video live streaming as the serving model does inferencing in the background. Try selecting a different model and tap **SERVE** again. 
 
-6. Shut down the server safely by clicking `SHUTDOWN`.
+6. Shut down the server safely when you're done by clicking **SHUTDOWN**.
 
 ## :strawberry:How It Works
 
