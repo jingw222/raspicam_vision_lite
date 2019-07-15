@@ -1,8 +1,8 @@
 import os
 import sys
 import logging
-from flask import Flask, Response, render_template, request, session, flash
-from .camera import VideoStreamCV2, VideoStreamPiCam
+from flask import Flask, Response, render_template, request, session
+from .camera import VideoStreamCV2, VideoStreamPiCam, VideoStreamCustom
 from .interpreter import TFLiteInterpreter
 from .stream import gen
 from config import config
@@ -23,9 +23,11 @@ def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     
-    # Builds a camera instance
-    camera = VideoStreamPiCam()
-
+    # Builds a camera instance from one of the three
+    # camera = VideoStreamCV2()
+    # camera = VideoStreamPiCam()
+    camera = VideoStreamCustom()
+    
     @app.route('/', methods=['GET', 'POST'])
     def index():
         if session.get('candidates') is None:
