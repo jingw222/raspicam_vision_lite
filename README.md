@@ -2,15 +2,16 @@
 
 RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletsprojects.com/p/flask) web app that serves on [Raspberry Pi](https://www.raspberrypi.org) and streams live video from its camera module at high frame rates while doing on-device image classification asynchronously with [TensorFlow Lite](https://www.tensorflow.org/lite) models. 
 
+
 ## :strawberry:Overview
 
-- RasPiCam Vision Lite allows you to efficiently serve and switch over multiple TensorFlow Lite models for image classification with just a few clicks.
+- RasPiCam Vision Lite allows you to efficiently **serve and switch** over multiple TensorFlow Lite models for image classification with just a few clicks.
 
-- It takes advantage of concurrency and multiprocessing and shifts the computational heavy lifting of inference into dedicated subprocesses and threads, independent of video streaming feed, which to a large extent spares you the annoyance of choppy/stuttering frames when they're processed synchronously. 
+- It takes advantage of **concurrency and multiprocessing** and shifts the computational heavy lifting of inference into dedicated subprocesses and threads, independent of video streaming feed, which to a large extent spares you the annoyance of choppy/stuttering frames when they're processed synchronously. 
 
 - You get more things done with a simple, beautiful and flat design. Because why not?
-[![demo](img/demo.png)](https://github.com/jingw222/raspicam_vision_lite)
 
+[![demo](img/demo.png)](https://github.com/jingw222/raspicam_vision_lite)
 
 
 ## :strawberry:Usage
@@ -27,7 +28,6 @@ RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletspr
            └── labels.txt
     ```
 
-
 3. Start a Flask web server by running `python3 main.py` under the repository root.
 
 4. Open a browser and access the IP address distributed to Raspberry Pi in your local network with default port 5000 (e.g. 192.168.0.104:5000) . You'll be greeted by the web interface as shown above. 
@@ -36,8 +36,10 @@ RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletspr
 
 6. Shut down the server safely when you're done by clicking **SHUTDOWN**.
 
+
 ## :strawberry:How It Works
 
+![demo](img/raspicam-how-it-works.jpg)
 
 
 ## :strawberry:Dependencies
