@@ -1,19 +1,15 @@
 # RasPiCam Vision Lite
 
-RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletsprojects.com/p/flask) web app that serves on [Raspberry Pi](https://www.raspberrypi.org) and streams live video from its camera module at high framerates while doing on-device image classification asynchronously with [TensorFlow Lite](https://www.tensorflow.org/lite) models. 
+RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletsprojects.com/p/flask) web app that serves on [Raspberry Pi](https://www.raspberrypi.org) and streams live video from its camera module at high frame rates while doing on-device image classification asynchronously with [TensorFlow Lite](https://www.tensorflow.org/lite) models. 
 
 ## :strawberry:Overview
 
-With RasPiCam Vision Lite,
+- RasPiCam Vision Lite allows you to efficiently serve and switch over multiple TensorFlow Lite models for image classification with just a few clicks.
 
-- efficiently serving and comparing multiple TensorFlow Lite models for image classification is just a few clicks away.
+- It takes advantage of concurrency and multiprocessing and shifts the computational heavy lifting of inference into dedicated subprocesses and threads, independent of video streaming feed, which to a large extent spares you the annoyance of choppy/stuttering frames when they're processed synchronously. 
 
-- you can takes advantage of multiprocessing and shifts the computational heavy lifting of inferencing into dedicated subprocesses, independent of video streaming feed. 
-
-
-![demo](img/demo.png)
-
-
+- You get more things done with a simple, beautiful and flat design. Because why not?
+[![demo](img/demo.png)](https://github.com/jingw222/raspicam_vision_lite)
 
 
 
@@ -21,7 +17,7 @@ With RasPiCam Vision Lite,
 
 1. Open a terminal, SSH into your Raspberry Pi and clone the repository.
 
-2. *(Optional)* To use models other than the defaults that come with this repository, you can still download and use some other offically released [hosted models](https://www.tensorflow.org/lite/guide/hosted_models#quantized_models) as this project does. Alternatively, train your own custom TensorFlow Lite (optimally [quantized](https://www.tensorflow.org/lite/performance/post_training_quantization)) models either via transfer learning or from scratch, and then place them along with labels inside `models/` just like the rest of them:
+2. *(Optional)* To use models other than the defaults that come with this repository, you can still download and use some other offically released [hosted models](https://www.tensorflow.org/lite/guide/hosted_models#quantized_models) as this project does. Alternatively, train your own custom TensorFlow Lite (optimally [quantized](https://www.tensorflow.org/lite/performance/post_training_quantization)) models either via transfer learning or from scratch, and then place them along with labels inside `models/` simply as the rest of them:
 
     ```
     .
@@ -36,7 +32,7 @@ With RasPiCam Vision Lite,
 
 4. Open a browser and access the IP address distributed to Raspberry Pi in your local network with default port 5000 (e.g. 192.168.0.104:5000) . You'll be greeted by the web interface as shown above. 
 
-5. Go select one of the models from the dropdown list, and press the **SERVE** button to watch video live streaming as the serving model does inferencing in the background. Try selecting a different model and tap **SERVE** again. 
+5. Go select one of the models from the dropdown list, and press the **SERVE** button to watch video live streaming as the serving model does inferencing in the background. Try selecting a different model and serve it again. 
 
 6. Shut down the server safely when you're done by clicking **SHUTDOWN**.
 
@@ -46,7 +42,7 @@ With RasPiCam Vision Lite,
 
 ## :strawberry:Dependencies
 
-Following configurations are fully tested. Some variations could also work, but no guarantee.
+Following setups are fully tested. Some variations could also work, but no guarantee.
 
 **Hardwares**
 - Raspberry Pi 3 Model B+
