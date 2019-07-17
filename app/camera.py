@@ -2,11 +2,11 @@ import io
 import os
 import sys
 import cv2
-import threading
 import logging
 import picamera
 import picamera.array
 import numpy as np
+import multiprocessing as mp
 
 
 WIDTH, HEIGHT = 1024, 768
@@ -30,7 +30,7 @@ class VideoStreamCV2(object):
         self.cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
         
         # Makes sure video streaming is thread-safe
-        self.lock = threading.Lock()
+        self.lock = mp.Lock()
         
         logger.info('OpenCV VideoCapture created.')
 
@@ -69,7 +69,7 @@ class VideoStreamPiCam(object):
         logger.info('Streamer created.')
         
         # Makes sure video streaming is thread-safe
-        self.lock = threading.Lock()
+        self.lock = mp.Lock()
         
 
     def __del__(self):
@@ -99,7 +99,7 @@ class StreamingOutput(object):
     def __init__(self):
         self.frame = None
         self.buffer = io.BytesIO()
-        self.condition = threading.Condition()
+        self.condition = mp.Condition()
 
         
     def write(self, buf):
