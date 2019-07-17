@@ -72,8 +72,9 @@ def gen(camera, model):
     REC_COLOR = (64, 64, 64)
     ALPHA = 0.6
     ANCHOR = (20, 20)
+    text_maxlength = max((len(x) for x in model.labels))
     (_, text_height), _ = cv2.getTextSize('test text', FONT_FACE, FONT_SCALE, THICKNESS)
-    rectangle_shape = (260, text_height*(2*(TOP_K+2)+1))
+    rectangle_shape = (text_maxlength*9, text_height*(2*(TOP_K+2)+1))
     
     # Starts generating video frames indefinitely
     label_text = ''
