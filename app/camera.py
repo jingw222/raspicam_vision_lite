@@ -131,6 +131,7 @@ class VideoStreamCustom(object):
         
         self.stream = StreamingOutput()
         self.camera.start_recording(self.stream, format='mjpeg')
+        self.camera.wait_recording(2)
         
 
     def __del__(self):
