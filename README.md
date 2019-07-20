@@ -9,9 +9,9 @@ RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletspr
 
 - It takes advantage of **concurrency and multiprocessing** and shifts the computational heavy lifting of inference into dedicated subprocesses and threads, independent of video streaming feed, which to a large extent spares you the annoyance of choppy/stuttering frames when they're processed synchronously. 
 
-- You get more things done with a simple, beautiful and flat design. Because why not?
+- You get more things done with a simple, beautiful and flat design. Because why not? *(Click on the preview below for a demo video)*
 
-[![demo](img/demo.png)](https://github.com/jingw222/raspicam_vision_lite)
+[![demo](img/demo.png)](https://www.youtube.com/watch?v=l8zcCfQgHXg)
 
 
 ## :strawberry:Usage
