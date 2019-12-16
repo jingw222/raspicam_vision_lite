@@ -60,12 +60,15 @@ class TFLiteInterpreter(object):
         startw = w//2-(w_new//2)
         return x[:, startw:startw+w_new]
         
+
+    def resize(self, x):
+        return cv2.resize(x, (self.INPUT_WIDTH, self.INPUT_HEIGHT))
+    
         
     def pre_process(self, x):
         # x = self.crop_square(x)
-        x = cv2.resize(x, (self.INPUT_WIDTH, self.INPUT_HEIGHT))
-        x = np.expand_dims(x, axis=0)
-        return x
+        x = self.resize(x)
+        return np.expand_dims(x, axis=0)
     
     
     @timeit
