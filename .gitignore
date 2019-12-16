@@ -1,12 +1,17 @@
+# System
 .DS_Store
+
+# Python
 .ipynb_checkpoints/
 __pycache__/
-tf1-py35
 *.ipynb
 *.py[cod]
-*.log
-instance/
-rpi_camera_webstream.py
+
+# Excludes everything in models/ except for *.tflite and labels.txt
 **/models/*/*
 !*.tflite
 !labels.txt
+
+# Env
+.vscode/
+.venv/
