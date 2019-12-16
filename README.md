@@ -47,17 +47,17 @@ RasPiCam Vision Lite is a minimalistic and lightweight [Flask](https://palletspr
 Following setups are fully tested. Some variations could also work, but no guarantee.
 
 **Hardwares**
-- Raspberry Pi 3 Model B+
+- Raspberry Pi 3 Model B+, 4 Model B
 - Pi Camera Module V2
 
 **Softwares**
-- Raspbian 9 (stretch)
+- Raspbian 9+
 - Python 3.5+
-- TensorFlow 2.0 
+- TensorFlow 2.0
 - OpenCV 4.1
-- Flask 1.1.0
+- Flask 1.1.0+
 - Picamera 1.13
-- Chrome 75, Safari 12
+- Chrome, Safari
 
 ## :strawberry:License
 
