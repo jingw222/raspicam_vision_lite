@@ -3,4 +3,4 @@ numpy>=1.16.4
 picamera==1.13
 opencv-python==4.1.0.25
 opencv-contrib-python==4.1.0.25
-tensorflow==2.0.0
+tensorflow==2.5.1
