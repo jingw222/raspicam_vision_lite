@@ -2,5 +2,5 @@ Flask>=1.1.0
 numpy>=1.16.4
 picamera==1.13
 opencv-python==4.1.0.25
-opencv-contrib-python==4.1.0.25
+opencv-contrib-python==4.1.1.26
 tensorflow==2.0.0
